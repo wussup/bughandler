@@ -2,6 +2,9 @@ package pl.edu.agh.toik.bughandler.util;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Properties;
 
 import javax.mail.Message;
@@ -12,7 +15,54 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import pl.edu.agh.toik.bughandler.annotations.Catch;
+import pl.edu.agh.toik.bughandler.interfaces.ICatchTask;
+
 public class Utils {
+
+	public static void invokeCatchTask(Catch adn, Exception ex) {
+		List<Class<?>> processorCandidates = ReflectionHelper
+				.findClassesImpmenenting(ICatchTask.class,
+						ICatchTask.class.getPackage());
+		String taskClassName;
+		if (isContainName(processorCandidates, adn.className()))
+			taskClassName = adn.className();
+		else
+			taskClassName = "DefaultCatchTask";
+		for (Class<?> c : processorCandidates) {
+			String[] splittedName = c.getName().split("\\.");
+			if (splittedName[splittedName.length - 1].equals(taskClassName)) {
+				Method[] allMethods = c.getDeclaredMethods();
+				for (Method m : allMethods) {
+					if (m.getName().equals("proceed")) {
+						try {
+							m.invoke(c.newInstance(), ex);
+						} catch (IllegalAccessException e) {
+							e.printStackTrace();
+						} catch (IllegalArgumentException e) {
+							e.printStackTrace();
+						} catch (InvocationTargetException e) {
+							e.printStackTrace();
+						} catch (InstantiationException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private static boolean isContainName(List<Class<?>> list, String name) {
+		for (Class<?> c : list) {
+			String[] splittedName = c.getName().split("\\.");
+			if (splittedName[splittedName.length - 1].equals(name)) {
+				return true;
+			}
+		}
+		System.out.println("[Warning] Can not find class " + name
+				+ ". Replace class name with DefaultCatchTask.");
+		return false;
+	}
 
 	public static void sendEmailMessage(Exception ex) {
 		Properties props = new Properties();
@@ -45,8 +95,7 @@ public class Utils {
 					.append("\tOS: " + System.getProperty("os.name"))
 					.append("\n\tOS version: "
 							+ System.getProperty("os.version"))
-					.append("\n\tUser name: "
-							+ System.getProperty("user.name"))
+					.append("\n\tUser name: " + System.getProperty("user.name"))
 					.append("\n\tUser language: "
 							+ System.getProperty("user.language"))
 					.append("\n\tUser country: "
@@ -57,7 +106,8 @@ public class Utils {
 							+ System.getProperty("java.runtime.version"))
 					.append("\n\tJava VM version: "
 							+ System.getProperty("java.vm.version"))
-					.append("\n\n\nBest regards,\nYour BugHandler Team").toString();
+					.append("\n\n\nBest regards,\nYour BugHandler Team")
+					.toString();
 
 			message.setText(stackTrace);
 
@@ -76,9 +126,8 @@ public class Utils {
 		String stackTrace = sw.toString(); // stack trace as a string
 		return stackTrace;
 	}
-	
-	public static void printSystemProperties()
-	{
+
+	public static void printSystemProperties() {
 		System.getProperties().list(System.out);
 	}
 

@@ -113,7 +113,7 @@ public class Utils {
 
 			Transport.send(message);
 
-			System.out.println("Bug report has been sent");
+			System.out.println("[Info] Bug report has been sent");
 		} catch (MessagingException e) {
 			throw new RuntimeException(e);
 		}

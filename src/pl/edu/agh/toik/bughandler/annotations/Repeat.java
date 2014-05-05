@@ -8,6 +8,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Repeat {
-	int count();
-	int time();
+	int count() default 1;
+	int time() default 0;
 } 

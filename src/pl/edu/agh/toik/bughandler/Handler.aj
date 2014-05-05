@@ -28,7 +28,7 @@ public aspect Handler {
 			try {
 				return proceed(adn);
 			} catch (Exception ex) {
-				System.out.println("Exception occured with Repeat annotation:");
+				System.out.println("[Info] Exception occured with Repeat annotation:");
 				ex.printStackTrace(System.err);
 			}
 			i++;

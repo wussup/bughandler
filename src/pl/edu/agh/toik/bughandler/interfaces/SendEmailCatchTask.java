@@ -2,7 +2,7 @@ package pl.edu.agh.toik.bughandler.interfaces;
 
 import pl.edu.agh.toik.bughandler.util.Utils;
 
-public class SendEmailCatchTask implements ICatchTask {
+public class SendEmailCatchTask implements ITask {
 
 	@Override
 	public void proceed(Exception ex) {

@@ -16,14 +16,15 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import pl.edu.agh.toik.bughandler.annotations.Catch;
-import pl.edu.agh.toik.bughandler.interfaces.ICatchTask;
+import pl.edu.agh.toik.bughandler.annotations.Repeat;
+import pl.edu.agh.toik.bughandler.interfaces.ITask;
 
 public class Utils {
 
 	public static void invokeCatchTask(Catch adn, Exception ex) {
 		List<Class<?>> processorCandidates = ReflectionHelper
-				.findClassesImpmenenting(ICatchTask.class,
-						ICatchTask.class.getPackage());
+				.findClassesImpmenenting(ITask.class,
+						ITask.class.getPackage());
 		String taskClassName;
 		if (isContainName(processorCandidates, adn.className()))
 			taskClassName = adn.className();
@@ -51,6 +52,38 @@ public class Utils {
 			}
 		}
 	}
+	
+	public static void invokeRepeatTask(Repeat adn, Exception ex) {
+		List<Class<?>> processorCandidates = ReflectionHelper
+				.findClassesImpmenenting(ITask.class,
+						ITask.class.getPackage());
+		String taskClassName;
+		
+		taskClassName = adn.handlerName();
+		
+		for (Class<?> c : processorCandidates) {
+			String[] splittedName = c.getName().split("\\.");
+			if (splittedName[splittedName.length - 1].equals(taskClassName)) {
+				Method[] allMethods = c.getDeclaredMethods();
+				for (Method m : allMethods) {
+					if (m.getName().equals("proceed")) {
+						try {
+							m.invoke(c.newInstance(), ex);
+						} catch (IllegalAccessException e) {
+							e.printStackTrace();
+						} catch (IllegalArgumentException e) {
+							e.printStackTrace();
+						} catch (InvocationTargetException e) {
+							e.printStackTrace();
+						} catch (InstantiationException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+		}
+	}
+	
 
 	private static boolean isContainName(List<Class<?>> list, String name) {
 		for (Class<?> c : list) {
@@ -76,15 +109,15 @@ public class Utils {
 		Session session = Session.getDefaultInstance(props,
 				new javax.mail.Authenticator() {
 					protected PasswordAuthentication getPasswordAuthentication() {
-						return new PasswordAuthentication(Const.EMAIL_LOGIN,
-								Const.PASSWORD);
+						return new PasswordAuthentication("",
+								"");
 					}
 				});
 
 		try {
 			Message message = new MimeMessage(session);
 			message.setRecipients(Message.RecipientType.TO,
-					InternetAddress.parse(Const.RECIPIENTS));
+					InternetAddress.parse(""));
 			message.setSubject("[BugHandler] New error: "
 					+ ex.getClass().getName() + ": " + ex.getMessage());
 

@@ -1,6 +1,6 @@
 package pl.edu.agh.toik.bughandler.interfaces;
 
-public interface ICatchTask {
+public interface ITask {
 
 	void proceed(Exception ex);
 	

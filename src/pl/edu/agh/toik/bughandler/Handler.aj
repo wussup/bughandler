@@ -10,7 +10,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import com.sun.xml.internal.fastinfoset.stax.events.Util;
 
 import pl.edu.agh.toik.bughandler.annotations.Catch;
 import pl.edu.agh.toik.bughandler.annotations.Ignore;
@@ -43,7 +42,7 @@ public aspect Handler {
 			try {
 				return proceed(adn);
 			} catch (Exception ex) {
-				if (!Util.isEmptyString(adn.handlerName())) {
+				if (!Utils.isEmptyString(adn.handlerName())) {
 					Utils.invokeRepeatTask(adn, ex);
 				}
 				if (!adn.onlyHandler()) {

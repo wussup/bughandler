@@ -7,7 +7,7 @@ import pl.edu.agh.toik.bughandler.annotations.Repeat;
 
 public class Test {
 
-	@Repeat(count = 2, time = 2000, handlerName = "DefaultCatchTask", onlyHandler = true)
+	@Repeat(count = 2, time = 2000, handlerName = "DefaultCatchTask", onlyHandler = false)
 	public static void test() throws Exception {
 		throw new Exception("Fatal error! Turn off your computer");
 	}

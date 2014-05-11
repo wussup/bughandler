@@ -151,6 +151,10 @@ public class Utils {
 			throw new RuntimeException(e);
 		}
 	}
+	
+	public static boolean isEmptyString (String str){
+		return str.isEmpty() || str == null;
+	}
 
 	private static String stackTraceAsString(Exception ex) {
 		StringWriter sw = new StringWriter();

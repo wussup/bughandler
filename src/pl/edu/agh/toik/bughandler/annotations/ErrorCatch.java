@@ -9,5 +9,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ErrorCatch {
 	String handlerName() default "";
+
 	boolean onlyHandler() default false;
-} 
+}

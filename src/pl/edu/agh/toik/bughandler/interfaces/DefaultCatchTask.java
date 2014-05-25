@@ -6,7 +6,7 @@ public class DefaultCatchTask implements ITask {
 
 	@Override
 	public void proceed(Exception ex) {
-		System.out.println("[Info] LALALALA Exception occured with Catch annotation:");
+		System.out.println("[Info] Exception occured with DefaultCatchTask:");
 		ex.printStackTrace(System.err);
 	}
 

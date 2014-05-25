@@ -9,7 +9,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ErrorRepeat {
 	int count() default 1;
+
 	int time() default 0;
+
 	String handlerName() default "";
+
 	boolean onlyHandler() default false;
-} 
+}

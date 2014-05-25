@@ -25,8 +25,7 @@ public class Utils {
 
 	public static void invokeCatchTask(ErrorCatch adn, Exception ex) {
 		List<Class<?>> processorCandidates = ReflectionHelper
-				.findClassesImpmenenting(ITask.class,
-						ITask.class.getPackage());
+				.findClassesImpmenenting(ITask.class, ITask.class.getPackage());
 		String taskClassName;
 		if (isContainName(processorCandidates, adn.handlerName()))
 			taskClassName = adn.handlerName();
@@ -54,15 +53,14 @@ public class Utils {
 			}
 		}
 	}
-	
+
 	public static void invokeRepeatTask(ErrorRepeat adn, Exception ex) {
 		List<Class<?>> processorCandidates = ReflectionHelper
-				.findClassesImpmenenting(ITask.class,
-						ITask.class.getPackage());
+				.findClassesImpmenenting(ITask.class, ITask.class.getPackage());
 		String taskClassName;
-		
+
 		taskClassName = adn.handlerName();
-		
+
 		for (Class<?> c : processorCandidates) {
 			String[] splittedName = c.getName().split("\\.");
 			if (splittedName[splittedName.length - 1].equals(taskClassName)) {
@@ -85,15 +83,14 @@ public class Utils {
 			}
 		}
 	}
-	
+
 	public static void invokeLogToFileTask(ErrorLogToFile adn, Exception ex) {
 		List<Class<?>> processorCandidates = ReflectionHelper
-				.findClassesImpmenenting(ITask.class,
-						ITask.class.getPackage());
+				.findClassesImpmenenting(ITask.class, ITask.class.getPackage());
 		String taskClassName;
-		
+
 		taskClassName = adn.handlerName();
-		
+
 		for (Class<?> c : processorCandidates) {
 			String[] splittedName = c.getName().split("\\.");
 			if (splittedName[splittedName.length - 1].equals(taskClassName)) {
@@ -116,15 +113,14 @@ public class Utils {
 			}
 		}
 	}
-	
+
 	public static void invokeIgnoreTask(ErrorIgnore adn, Exception ex) {
 		List<Class<?>> processorCandidates = ReflectionHelper
-				.findClassesImpmenenting(ITask.class,
-						ITask.class.getPackage());
+				.findClassesImpmenenting(ITask.class, ITask.class.getPackage());
 		String taskClassName;
-		
+
 		taskClassName = adn.handlerName();
-		
+
 		for (Class<?> c : processorCandidates) {
 			String[] splittedName = c.getName().split("\\.");
 			if (splittedName[splittedName.length - 1].equals(taskClassName)) {
@@ -147,7 +143,6 @@ public class Utils {
 			}
 		}
 	}
-	
 
 	private static boolean isContainName(List<Class<?>> list, String name) {
 		for (Class<?> c : list) {
@@ -173,8 +168,7 @@ public class Utils {
 		Session session = Session.getDefaultInstance(props,
 				new javax.mail.Authenticator() {
 					protected PasswordAuthentication getPasswordAuthentication() {
-						return new PasswordAuthentication("",
-								"");
+						return new PasswordAuthentication("", "");
 					}
 				});
 
@@ -215,8 +209,8 @@ public class Utils {
 			throw new RuntimeException(e);
 		}
 	}
-	
-	public static boolean isEmptyString (String str){
+
+	public static boolean isEmptyString(String str) {
 		return str == null || str.isEmpty();
 	}
 

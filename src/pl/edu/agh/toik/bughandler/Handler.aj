@@ -16,7 +16,6 @@ import pl.edu.agh.toik.bughandler.annotations.ErrorRepeat;
 
 import pl.edu.agh.toik.bughandler.util.Utils;
 
-
 public aspect Handler {
 
 	pointcut repeat(ErrorRepeat adn) : execution(@ErrorRepeat * *.*(..)) && @annotation(adn);

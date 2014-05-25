@@ -15,19 +15,21 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import pl.edu.agh.toik.bughandler.annotations.Catch;
-import pl.edu.agh.toik.bughandler.annotations.Repeat;
+import pl.edu.agh.toik.bughandler.annotations.ErrorCatch;
+import pl.edu.agh.toik.bughandler.annotations.ErrorIgnore;
+import pl.edu.agh.toik.bughandler.annotations.ErrorLogToFile;
+import pl.edu.agh.toik.bughandler.annotations.ErrorRepeat;
 import pl.edu.agh.toik.bughandler.interfaces.ITask;
 
 public class Utils {
 
-	public static void invokeCatchTask(Catch adn, Exception ex) {
+	public static void invokeCatchTask(ErrorCatch adn, Exception ex) {
 		List<Class<?>> processorCandidates = ReflectionHelper
 				.findClassesImpmenenting(ITask.class,
 						ITask.class.getPackage());
 		String taskClassName;
-		if (isContainName(processorCandidates, adn.className()))
-			taskClassName = adn.className();
+		if (isContainName(processorCandidates, adn.handlerName()))
+			taskClassName = adn.handlerName();
 		else
 			taskClassName = "DefaultCatchTask";
 		for (Class<?> c : processorCandidates) {
@@ -53,7 +55,69 @@ public class Utils {
 		}
 	}
 	
-	public static void invokeRepeatTask(Repeat adn, Exception ex) {
+	public static void invokeRepeatTask(ErrorRepeat adn, Exception ex) {
+		List<Class<?>> processorCandidates = ReflectionHelper
+				.findClassesImpmenenting(ITask.class,
+						ITask.class.getPackage());
+		String taskClassName;
+		
+		taskClassName = adn.handlerName();
+		
+		for (Class<?> c : processorCandidates) {
+			String[] splittedName = c.getName().split("\\.");
+			if (splittedName[splittedName.length - 1].equals(taskClassName)) {
+				Method[] allMethods = c.getDeclaredMethods();
+				for (Method m : allMethods) {
+					if (m.getName().equals("proceed")) {
+						try {
+							m.invoke(c.newInstance(), ex);
+						} catch (IllegalAccessException e) {
+							e.printStackTrace();
+						} catch (IllegalArgumentException e) {
+							e.printStackTrace();
+						} catch (InvocationTargetException e) {
+							e.printStackTrace();
+						} catch (InstantiationException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	public static void invokeLogToFileTask(ErrorLogToFile adn, Exception ex) {
+		List<Class<?>> processorCandidates = ReflectionHelper
+				.findClassesImpmenenting(ITask.class,
+						ITask.class.getPackage());
+		String taskClassName;
+		
+		taskClassName = adn.handlerName();
+		
+		for (Class<?> c : processorCandidates) {
+			String[] splittedName = c.getName().split("\\.");
+			if (splittedName[splittedName.length - 1].equals(taskClassName)) {
+				Method[] allMethods = c.getDeclaredMethods();
+				for (Method m : allMethods) {
+					if (m.getName().equals("proceed")) {
+						try {
+							m.invoke(c.newInstance(), ex);
+						} catch (IllegalAccessException e) {
+							e.printStackTrace();
+						} catch (IllegalArgumentException e) {
+							e.printStackTrace();
+						} catch (InvocationTargetException e) {
+							e.printStackTrace();
+						} catch (InstantiationException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	public static void invokeIgnoreTask(ErrorIgnore adn, Exception ex) {
 		List<Class<?>> processorCandidates = ReflectionHelper
 				.findClassesImpmenenting(ITask.class,
 						ITask.class.getPackage());

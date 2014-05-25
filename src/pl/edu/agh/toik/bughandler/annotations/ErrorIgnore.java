@@ -7,6 +7,7 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Ignore {	
+public @interface ErrorIgnore {
+	String handlerName() default "";
 } 
 

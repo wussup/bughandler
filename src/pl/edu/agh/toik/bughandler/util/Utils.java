@@ -217,7 +217,7 @@ public class Utils {
 	}
 	
 	public static boolean isEmptyString (String str){
-		return str.isEmpty() || str == null;
+		return str == null || str.isEmpty();
 	}
 
 	private static String stackTraceAsString(Exception ex) {

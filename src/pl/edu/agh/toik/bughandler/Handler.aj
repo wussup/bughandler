@@ -9,22 +9,13 @@ import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-<<<<<<< HEAD
 import pl.edu.agh.toik.bughandler.annotations.ErrorCatch;
 import pl.edu.agh.toik.bughandler.annotations.ErrorIgnore;
 import pl.edu.agh.toik.bughandler.annotations.ErrorLogToFile;
 import pl.edu.agh.toik.bughandler.annotations.ErrorRepeat;
-=======
 
-import pl.edu.agh.toik.bughandler.annotations.Catch;
-import pl.edu.agh.toik.bughandler.annotations.Ignore;
-import pl.edu.agh.toik.bughandler.annotations.LogToFile;
-import pl.edu.agh.toik.bughandler.annotations.Repeat;
->>>>>>> master
 import pl.edu.agh.toik.bughandler.util.Utils;
 
-import com.sun.xml.internal.fastinfoset.stax.events.Util;
 
 public aspect Handler {
 
@@ -40,7 +31,7 @@ public aspect Handler {
 		try {
 			return proceed(adn);
 		} catch (Exception ex) {
-			if (!Util.isEmptyString(adn.handlerName())) {
+			if (!Utils.isEmptyString(adn.handlerName())) {
 				Utils.invokeCatchTask(adn, ex);
 			}
 			if (!adn.onlyHandler()) {
@@ -85,7 +76,7 @@ public aspect Handler {
 		} catch (Exception ex) {
 			try {
 
-				if (!Util.isEmptyString(adn.handlerName())) {
+				if (!Utils.isEmptyString(adn.handlerName())) {
 					Utils.invokeLogToFileTask(adn, ex);
 				}
 
@@ -143,7 +134,7 @@ public aspect Handler {
 		try {
 			return proceed(adn);
 		} catch (Exception ex) {
-			if (!Util.isEmptyString(adn.handlerName())) {
+			if (!Utils.isEmptyString(adn.handlerName())) {
 				Utils.invokeIgnoreTask(adn, ex);
 			}
 		}

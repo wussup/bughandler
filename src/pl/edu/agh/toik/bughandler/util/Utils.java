@@ -23,12 +23,12 @@ import pl.edu.agh.toik.bughandler.interfaces.ITask;
 
 public class Utils {
 
-	public static void invokeCatchTask(ErrorCatch adn, Exception ex) {
+	public static Boolean invokeCatchTask(String handlerName, Exception ex) {
 		List<Class<?>> processorCandidates = ReflectionHelper
 				.findClassesImpmenenting(ITask.class, ITask.class.getPackage());
 		String taskClassName;
-		if (isContainName(processorCandidates, adn.handlerName()))
-			taskClassName = adn.handlerName();
+		if (isContainName(processorCandidates, handlerName))
+			taskClassName = handlerName;
 		else
 			taskClassName = "DefaultCatchTask";
 		for (Class<?> c : processorCandidates) {
@@ -38,7 +38,7 @@ public class Utils {
 				for (Method m : allMethods) {
 					if (m.getName().equals("proceed")) {
 						try {
-							m.invoke(c.newInstance(), ex);
+							return (Boolean) m.invoke(c.newInstance(), ex);
 						} catch (IllegalAccessException e) {
 							e.printStackTrace();
 						} catch (IllegalArgumentException e) {
@@ -52,9 +52,10 @@ public class Utils {
 				}
 			}
 		}
+		return null;
 	}
 
-	public static void invokeRepeatTask(ErrorRepeat adn, Exception ex) {
+	public static Boolean invokeRepeatTask(ErrorRepeat adn, Exception ex) {
 		List<Class<?>> processorCandidates = ReflectionHelper
 				.findClassesImpmenenting(ITask.class, ITask.class.getPackage());
 		String taskClassName;
@@ -68,7 +69,7 @@ public class Utils {
 				for (Method m : allMethods) {
 					if (m.getName().equals("proceed")) {
 						try {
-							m.invoke(c.newInstance(), ex);
+							return (Boolean) m.invoke(c.newInstance(), ex);
 						} catch (IllegalAccessException e) {
 							e.printStackTrace();
 						} catch (IllegalArgumentException e) {
@@ -82,9 +83,10 @@ public class Utils {
 				}
 			}
 		}
+		return null;
 	}
 
-	public static void invokeLogToFileTask(ErrorLogToFile adn, Exception ex) {
+	public static Boolean invokeLogToFileTask(ErrorLogToFile adn, Exception ex) {
 		List<Class<?>> processorCandidates = ReflectionHelper
 				.findClassesImpmenenting(ITask.class, ITask.class.getPackage());
 		String taskClassName;
@@ -98,7 +100,7 @@ public class Utils {
 				for (Method m : allMethods) {
 					if (m.getName().equals("proceed")) {
 						try {
-							m.invoke(c.newInstance(), ex);
+							return (Boolean) m.invoke(c.newInstance(), ex);
 						} catch (IllegalAccessException e) {
 							e.printStackTrace();
 						} catch (IllegalArgumentException e) {
@@ -112,9 +114,10 @@ public class Utils {
 				}
 			}
 		}
+		return null;
 	}
 
-	public static void invokeIgnoreTask(ErrorIgnore adn, Exception ex) {
+	public static Boolean invokeIgnoreTask(ErrorIgnore adn, Exception ex) {
 		List<Class<?>> processorCandidates = ReflectionHelper
 				.findClassesImpmenenting(ITask.class, ITask.class.getPackage());
 		String taskClassName;
@@ -128,7 +131,7 @@ public class Utils {
 				for (Method m : allMethods) {
 					if (m.getName().equals("proceed")) {
 						try {
-							m.invoke(c.newInstance(), ex);
+							return (Boolean) m.invoke(c.newInstance(), ex);
 						} catch (IllegalAccessException e) {
 							e.printStackTrace();
 						} catch (IllegalArgumentException e) {
@@ -142,6 +145,7 @@ public class Utils {
 				}
 			}
 		}
+		return null;
 	}
 
 	private static boolean isContainName(List<Class<?>> list, String name) {

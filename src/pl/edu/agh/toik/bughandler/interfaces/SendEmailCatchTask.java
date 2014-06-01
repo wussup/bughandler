@@ -5,10 +5,11 @@ import pl.edu.agh.toik.bughandler.util.Utils;
 public class SendEmailCatchTask implements ITask {
 
 	@Override
-	public void proceed(Exception ex) {
+	public Boolean proceed(Exception ex) {
 		System.out.println("[Info] Exception occured with Catch annotation:");
 		ex.printStackTrace(System.err);
 		Utils.sendEmailMessage(ex);
+		return null;
 	}
 
 }

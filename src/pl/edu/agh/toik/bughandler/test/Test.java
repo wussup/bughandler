@@ -12,7 +12,7 @@ public class Test {
 		throw new Exception("Fatal error! Turn off your computer");
 	}
 
-	@ErrorCatch(/*catchExceptions = { "Exception" },*/ uncatchExceptions = { "ArrayIndexOutOfBoundsException" })
+	@ErrorCatch(/* catchExceptions = { "Exception" }, */uncatchExceptions = { "ArrayIndexOutOfBoundsException" })
 	public static void test2() throws Exception {
 		throw new ArrayIndexOutOfBoundsException(
 				"Fatal error2! Turn off your computer");
@@ -24,7 +24,8 @@ public class Test {
 	}
 
 	public static void test4() throws Exception {
-		throw new Exception("Fatal error4! Turn off your computer");
+		throw new ArrayIndexOutOfBoundsException(
+				"Fatal error4! Turn off your computer");
 	}
 
 	@ErrorLogToFile(fileName = "lol.txt", handlerName = "DefaultCatchTask", onlyHandler = false)
@@ -33,11 +34,11 @@ public class Test {
 	}
 
 	public static void main(String[] args) throws Exception {
-		//test();
-		//test2();
-		//test3();
+		// test();
+		// test2();
+		// test3();
 		test4();
-		//test5();
+		// test5();
 	}
 
 }

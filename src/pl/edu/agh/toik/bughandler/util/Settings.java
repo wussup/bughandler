@@ -18,9 +18,11 @@ public class Settings {
 
 			String line;
 			while ((line = br.readLine()) != null) {
-				String[] splittedLine = line.split("=");
-				if (splittedLine.length == 2)
-					settings.put(splittedLine[0], splittedLine[1]);
+				if (!line.startsWith("#")) {
+					String[] splittedLine = line.split("=");
+					if (splittedLine.length == 2)
+						settings.put(splittedLine[0], splittedLine[1]);
+				}
 			}
 			br.close();
 		} catch (FileNotFoundException e) {

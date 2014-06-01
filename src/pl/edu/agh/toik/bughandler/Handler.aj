@@ -26,17 +26,25 @@ public aspect Handler {
 	public static boolean shouldIgnore;
 	public static boolean shouldLog;
 	public static String catchTask;
+	public static String[] catchExceptionsArr;
+	public static String[] uncatchExceptionsArr;
 
 	public Handler() {
 		Map<String, String> settings = new Settings().getSettings();
 		String ignore = "shouldIgnore";
 		String log = "shouldLog";
 		String task = "catchTask";
+		String catchExceptionsStr = "catchExceptions";
+		String uncatchExceptionsStr = "uncatchExceptions";
 		shouldIgnore = settings.containsKey(ignore) ? Boolean.valueOf(settings
 				.get(ignore)) : true;
 		shouldLog = settings.containsKey(log) ? Boolean.valueOf(settings
 				.get(log)) : true;
 		catchTask = settings.containsKey(task) ? settings.get(task) : null;
+		catchExceptionsArr = settings.containsKey(catchExceptionsStr) ? settings
+				.get(catchExceptionsStr).split(",") : new String[] {};
+		uncatchExceptionsArr = settings.containsKey(uncatchExceptionsStr) ? settings
+				.get(uncatchExceptionsStr).split(",") : new String[] {};
 	}
 
 	pointcut catched(): execution(* *.*(..)) && if(catchTask != null);
@@ -54,7 +62,29 @@ public aspect Handler {
 		try {
 			return proceed();
 		} catch (Exception ex) {
-			Utils.invokeCatchTask(catchTask, ex);
+			ArrayList<String> catchExceptions = new ArrayList<String>(
+					Arrays.asList(catchExceptionsArr));
+			ArrayList<String> uncatchExceptions = new ArrayList<String>(
+					Arrays.asList(uncatchExceptionsArr));
+			String exceptionClass = ex.getClass().getSimpleName();
+			if ((!catchExceptions.isEmpty() && uncatchExceptions.isEmpty())
+					|| (!catchExceptions.isEmpty() && !uncatchExceptions
+							.isEmpty())) {
+				if (catchExceptions.contains(exceptionClass)) {
+					Utils.invokeCatchTask(catchTask, ex);
+				} else {
+					// ignore
+				}
+			} else if (catchExceptions.isEmpty()
+					&& !uncatchExceptions.isEmpty()) {
+				if (uncatchExceptions.contains(exceptionClass)) {
+					// ignore
+				} else {
+					Utils.invokeCatchTask(catchTask, ex);
+				}
+			} else {
+				Utils.invokeCatchTask(catchTask, ex);
+			}
 		}
 		return null;
 	}

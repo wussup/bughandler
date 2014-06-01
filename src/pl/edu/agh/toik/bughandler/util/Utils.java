@@ -15,7 +15,6 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import pl.edu.agh.toik.bughandler.annotations.ErrorCatch;
 import pl.edu.agh.toik.bughandler.annotations.ErrorIgnore;
 import pl.edu.agh.toik.bughandler.annotations.ErrorLogToFile;
 import pl.edu.agh.toik.bughandler.annotations.ErrorRepeat;

@@ -8,55 +8,102 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Map;
+
 import pl.edu.agh.toik.bughandler.annotations.ErrorCatch;
 import pl.edu.agh.toik.bughandler.annotations.ErrorIgnore;
 import pl.edu.agh.toik.bughandler.annotations.ErrorLogToFile;
 import pl.edu.agh.toik.bughandler.annotations.ErrorRepeat;
-
+import pl.edu.agh.toik.bughandler.util.Settings;
 import pl.edu.agh.toik.bughandler.util.Utils;
 
 public aspect Handler {
+
+	public static boolean shouldIgnore;
+	public static boolean shouldLog;
+
+	public Handler() {
+		Map<String, String> settings = new Settings().getSettings();
+		String ignore = "shouldIgnore";
+		String log = "shouldLog";
+		shouldIgnore = settings.containsKey(ignore) ? Boolean.valueOf(settings
+				.get(ignore)) : true;
+		shouldLog = settings.containsKey(log) ? Boolean.valueOf(settings
+				.get(log)) : true;
+	}
 
 	pointcut repeat(ErrorRepeat adn) : execution(@ErrorRepeat * *.*(..)) && @annotation(adn);
 
 	pointcut catchAdn(ErrorCatch adn) : execution(@ErrorCatch * *.*(..)) && @annotation(adn);
 
-	pointcut logToFileAdn(ErrorLogToFile adn) : execution (@ErrorLogToFile * *.*(..)) && @annotation(adn);
+	pointcut logToFileAdn(ErrorLogToFile adn) : execution (@ErrorLogToFile * *.*(..)) && @annotation(adn) && if(shouldLog);
 
-	pointcut ignoreAdn(ErrorIgnore adn) : execution (@ErrorIgnore * *.*(..)) && @annotation(adn);
+	pointcut ignoreAdn(ErrorIgnore adn) : execution (@ErrorIgnore * *.*(..)) && @annotation(adn) && if(shouldIgnore);
 
-	Object around(ErrorCatch adn): catchAdn(adn){
+	Object around(ErrorCatch adn) throws Exception: catchAdn(adn){
 		try {
 			return proceed(adn);
 		} catch (Exception ex) {
-			if (!Utils.isEmptyString(adn.handlerName())) {
-				Utils.invokeCatchTask(adn, ex);
-			}
-			if (!adn.onlyHandler()) {
-				System.out
-						.println("[Info] Exception occured with Catch annotation:");
-				ex.printStackTrace(System.err);
+			ArrayList<String> catchExceptions = new ArrayList<String>(
+					Arrays.asList(adn.catchExceptions()));
+			ArrayList<String> uncatchExceptions = new ArrayList<String>(
+					Arrays.asList(adn.uncatchExceptions()));
+			String exceptionClass = ex.getClass().getSimpleName();
+			if (catchExceptions.isEmpty()
+					|| catchExceptions.contains(exceptionClass)) {
+				if (!Utils.isEmptyString(adn.handlerName())) {
+					Utils.invokeCatchTask(adn, ex);
+				}
+				if (!adn.onlyHandler()) {
+					System.out
+							.println("[Info] Exception occured with Catch annotation:");
+					ex.printStackTrace(System.err);
+				}
+			} else {
+				if (uncatchExceptions.isEmpty()
+						|| !uncatchExceptions.contains(exceptionClass))
+					throw ex;
+				else {
+					// ignore
+				}
 			}
 		}
 
 		return null;
 	}
 
-	Object around(ErrorRepeat adn): repeat(adn)
+	Object around(ErrorRepeat adn) throws Exception: repeat(adn)
 	{
 		int i = 0;
 		while (i < adn.count()) {
 			try {
 				return proceed(adn);
 			} catch (Exception ex) {
-				if (!Utils.isEmptyString(adn.handlerName())) {
-					Utils.invokeRepeatTask(adn, ex);
-				}
-				if (!adn.onlyHandler()) {
-					System.out
-							.println("[Info] Exception occured with Repeat annotation:");
-					ex.printStackTrace(System.err);
+				ArrayList<String> catchExceptions = new ArrayList<String>(
+						Arrays.asList(adn.catchExceptions()));
+				ArrayList<String> uncatchExceptions = new ArrayList<String>(
+						Arrays.asList(adn.uncatchExceptions()));
+				String exceptionClass = ex.getClass().getSimpleName();
+				if (catchExceptions.isEmpty()
+						|| catchExceptions.contains(exceptionClass)) {
+					if (!Utils.isEmptyString(adn.handlerName())) {
+						Utils.invokeRepeatTask(adn, ex);
+					}
+					if (!adn.onlyHandler()) {
+						System.out
+								.println("[Info] Exception occured with Repeat annotation:");
+						ex.printStackTrace(System.err);
+					}
+				} else {
+					if (uncatchExceptions.isEmpty()
+							|| !uncatchExceptions.contains(exceptionClass))
+						throw ex;
+					else {
+						// ignore
+					}
 				}
 			}
 			i++;
@@ -69,72 +116,103 @@ public aspect Handler {
 		return null;
 	}
 
-	Object around(ErrorLogToFile adn) : logToFileAdn(adn){
+	Object around(ErrorLogToFile adn) throws Exception : logToFileAdn(adn){
 		try {
 			return proceed(adn);
 		} catch (Exception ex) {
-			try {
-
-				if (!Utils.isEmptyString(adn.handlerName())) {
-					Utils.invokeLogToFileTask(adn, ex);
-				}
-
-				if (!adn.onlyHandler()) {
-					File folder = new File("LogFolder");
-					if (!folder.exists()) {
-						folder.mkdir();
-					}
-					File file = new File("LogFolder/" + adn.fileName());
-					if (!file.exists()) {
-						file.createNewFile();
+			ArrayList<String> catchExceptions = new ArrayList<String>(
+					Arrays.asList(adn.catchExceptions()));
+			ArrayList<String> uncatchExceptions = new ArrayList<String>(
+					Arrays.asList(adn.uncatchExceptions()));
+			String exceptionClass = ex.getClass().getSimpleName();
+			if (catchExceptions.isEmpty()
+					|| catchExceptions.contains(exceptionClass)) {
+				try {
+					if (!Utils.isEmptyString(adn.handlerName())) {
+						Utils.invokeLogToFileTask(adn, ex);
 					}
 
-					StringWriter sw = new StringWriter();
-					PrintWriter pw = new PrintWriter(sw);
-					ex.printStackTrace(pw);
-					DateFormat formatter = new SimpleDateFormat(
-							"yyyy-MM-dd HH:mm:ss");
-					String sb = new StringBuilder("")
-							.append("Exception stack trace:" + "\n\n")
-							.append(sw.toString())
-							.append("\n\n" + "Details:\n")
-							.append("\n\tTime: " + formatter.format(new Date())
-									+ "\n")
-							.append("\tOS: " + System.getProperty("os.name"))
-							.append("\n\tOS version: "
-									+ System.getProperty("os.version"))
-							.append("\n\tUser name: "
-									+ System.getProperty("user.name"))
-							.append("\n\tUser language: "
-									+ System.getProperty("user.language"))
-							.append("\n\tUser country: "
-									+ System.getProperty("user.country"))
-							.append("\n\tJava version: "
-									+ System.getProperty("java.version"))
-							.append("\n\tJava runtime version: "
-									+ System.getProperty("java.runtime.version"))
-							.append("\n\tJava VM version: "
-									+ System.getProperty("java.vm.version"))
-							.toString();
+					if (!adn.onlyHandler()) {
+						File folder = new File("LogFolder");
+						if (!folder.exists()) {
+							folder.mkdir();
+						}
+						File file = new File("LogFolder/" + adn.fileName());
+						if (!file.exists()) {
+							file.createNewFile();
+						}
 
-					FileWriter fw = new FileWriter(file.getAbsoluteFile(), true);
-					BufferedWriter bw = new BufferedWriter(fw);
-					bw.write(sb);
-					bw.close();
+						StringWriter sw = new StringWriter();
+						PrintWriter pw = new PrintWriter(sw);
+						ex.printStackTrace(pw);
+						DateFormat formatter = new SimpleDateFormat(
+								"yyyy-MM-dd HH:mm:ss");
+						String sb = new StringBuilder("")
+								.append("Exception stack trace:" + "\n\n")
+								.append(sw.toString())
+								.append("\n\n" + "Details:\n")
+								.append("\n\tTime: "
+										+ formatter.format(new Date()) + "\n")
+								.append("\tOS: "
+										+ System.getProperty("os.name"))
+								.append("\n\tOS version: "
+										+ System.getProperty("os.version"))
+								.append("\n\tUser name: "
+										+ System.getProperty("user.name"))
+								.append("\n\tUser language: "
+										+ System.getProperty("user.language"))
+								.append("\n\tUser country: "
+										+ System.getProperty("user.country"))
+								.append("\n\tJava version: "
+										+ System.getProperty("java.version"))
+								.append("\n\tJava runtime version: "
+										+ System.getProperty("java.runtime.version"))
+								.append("\n\tJava VM version: "
+										+ System.getProperty("java.vm.version"))
+								.toString();
+
+						FileWriter fw = new FileWriter(file.getAbsoluteFile(),
+								true);
+						BufferedWriter bw = new BufferedWriter(fw);
+						bw.write(sb);
+						bw.close();
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
-			} catch (IOException e) {
-				e.printStackTrace();
+			} else {
+				if (uncatchExceptions.isEmpty()
+						|| !uncatchExceptions.contains(exceptionClass))
+					throw ex;
+				else {
+					// ignore
+				}
 			}
 		}
 		return null;
 	}
 
-	Object around(ErrorIgnore adn): ignoreAdn(adn){
+	Object around(ErrorIgnore adn) throws Exception: ignoreAdn(adn){
 		try {
 			return proceed(adn);
 		} catch (Exception ex) {
-			if (!Utils.isEmptyString(adn.handlerName())) {
-				Utils.invokeIgnoreTask(adn, ex);
+			ArrayList<String> catchExceptions = new ArrayList<String>(
+					Arrays.asList(adn.catchExceptions()));
+			ArrayList<String> uncatchExceptions = new ArrayList<String>(
+					Arrays.asList(adn.uncatchExceptions()));
+			String exceptionClass = ex.getClass().getSimpleName();
+			if (catchExceptions.isEmpty()
+					|| catchExceptions.contains(exceptionClass)) {
+				if (!Utils.isEmptyString(adn.handlerName())) {
+					Utils.invokeIgnoreTask(adn, ex);
+				}
+			} else {
+				if (uncatchExceptions.isEmpty()
+						|| !uncatchExceptions.contains(exceptionClass))
+					throw ex;
+				else {
+					// ignore
+				}
 			}
 		}
 		return null;

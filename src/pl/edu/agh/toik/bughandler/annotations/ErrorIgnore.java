@@ -9,4 +9,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ErrorIgnore {
 	String handlerName() default "";
+
+	String[] catchExceptions() default {};
+
+	String[] uncatchExceptions() default {};
 }

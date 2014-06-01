@@ -13,4 +13,8 @@ public @interface ErrorLogToFile {
 	String handlerName() default "";
 
 	boolean onlyHandler() default false;
+
+	String[] catchExceptions() default {};
+
+	String[] uncatchExceptions() default {};
 }

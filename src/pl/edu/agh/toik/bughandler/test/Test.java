@@ -1,5 +1,7 @@
 package pl.edu.agh.toik.bughandler.test;
 
+import java.io.IOException;
+
 import pl.edu.agh.toik.bughandler.annotations.ErrorCatch;
 import pl.edu.agh.toik.bughandler.annotations.ErrorIgnore;
 import pl.edu.agh.toik.bughandler.annotations.ErrorLogToFile;
@@ -12,12 +14,13 @@ public class Test {
 		throw new Exception("Fatal error! Turn off your computer");
 	}
 
-	@ErrorCatch
+	@ErrorCatch(catchExceptions = { "Exception" }, uncatchExceptions = { "ArrayIndexOutOfBoundsException" })
 	public static void test2() throws Exception {
-		throw new Exception("Fatal error2! Turn off your computer");
+		throw new IOException(
+				"Fatal error2! Turn off your computer");
 	}
 
-	@ErrorIgnore(handlerName = "DefaultCatchTask")
+	@ErrorIgnore()
 	public static void test3() throws Exception {
 		throw new Exception("Fatal error3! Turn off your computer");
 	}
@@ -33,9 +36,9 @@ public class Test {
 
 	public static void main(String[] args) throws Exception {
 		// test();
-		// test2();
+		test2();
 		// test3();
-		test5();
+		// test5();
 	}
 
 }

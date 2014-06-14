@@ -125,17 +125,18 @@ public aspect Handler {
 						proceedCatch(adn, ex);
 					}
 				}
-				if (errorType == ErrorType.CRITICAL)
-					System.exit(1);
 			}
-			return null;
+			if (errorType == ErrorType.CRITICAL)
+				System.exit(1);
 		}
+
+		return null;
 	}
 
 	private void proceedCatch(ErrorCatch adn, Exception ex) {
 		Boolean returnValue = false;
 		if (!Utils.isEmptyString(adn.handlerName())) {
-			returnValue = Utils.invokeCatchTask(adn.handlerName(), ex);
+			returnValue = Utils.invokeCatchTask(adn, ex);
 		}
 		if ((returnValue == null && !adn.onlyHandler())
 				|| (returnValue != null && !returnValue)) {
@@ -149,42 +150,50 @@ public aspect Handler {
 	{
 		int i = 0;
 		while (i < adn.count()) {
-			try {
+			ErrorType errorType = adn.errorType();
+			if (errorType == ErrorType.EASY)
 				return proceed(adn);
-			} catch (Exception ex) {
-				ArrayList<String> catchExceptions = new ArrayList<String>(
-						Arrays.asList(adn.catchExceptions()));
-				ArrayList<String> uncatchExceptions = new ArrayList<String>(
-						Arrays.asList(adn.uncatchExceptions()));
-				if (!catchExceptions.isEmpty() && !uncatchExceptions.isEmpty())
-					throw new BadParametersException(
-							"You should not pass parameters catchExceptions and uncatchExceptions together");
-				else {
-					String exceptionClass = ex.getClass().getSimpleName();
+			else {
+				try {
+					return proceed(adn);
+				} catch (Exception ex) {
+					ArrayList<String> catchExceptions = new ArrayList<String>(
+							Arrays.asList(adn.catchExceptions()));
+					ArrayList<String> uncatchExceptions = new ArrayList<String>(
+							Arrays.asList(adn.uncatchExceptions()));
 					if (!catchExceptions.isEmpty()
-							&& uncatchExceptions.isEmpty()) {
-						if (catchExceptions.contains(exceptionClass)) {
-							proceedRepeat(adn, ex);
+							&& !uncatchExceptions.isEmpty())
+						throw new BadParametersException(
+								"You should not pass parameters catchExceptions and uncatchExceptions together");
+					else {
+						String exceptionClass = ex.getClass().getSimpleName();
+						if (!catchExceptions.isEmpty()
+								&& uncatchExceptions.isEmpty()) {
+							if (catchExceptions.contains(exceptionClass)) {
+								proceedRepeat(adn, ex);
+							} else {
+								// ignore
+							}
+						} else if (catchExceptions.isEmpty()
+								&& !uncatchExceptions.isEmpty()) {
+							if (uncatchExceptions.contains(exceptionClass)) {
+								// ignore
+							} else {
+								proceedRepeat(adn, ex);
+							}
 						} else {
-							// ignore
-						}
-					} else if (catchExceptions.isEmpty()
-							&& !uncatchExceptions.isEmpty()) {
-						if (uncatchExceptions.contains(exceptionClass)) {
-							// ignore
-						} else {
 							proceedRepeat(adn, ex);
 						}
-					} else {
-						proceedRepeat(adn, ex);
 					}
+					if (errorType == ErrorType.CRITICAL)
+						System.exit(1);
 				}
-			}
-			i++;
-			try {
-				Thread.sleep(adn.time());
-			} catch (InterruptedException ex) {
-				ex.printStackTrace(System.err);
+				i++;
+				try {
+					Thread.sleep(adn.time());
+				} catch (InterruptedException ex) {
+					ex.printStackTrace(System.err);
+				}
 			}
 		}
 		return null;
@@ -204,37 +213,45 @@ public aspect Handler {
 	}
 
 	Object around(ErrorLogToFile adn) throws BadParametersException : logToFileAdn(adn){
-		try {
+		ErrorType errorType = adn.errorType();
+		if (errorType == ErrorType.EASY)
 			return proceed(adn);
-		} catch (Exception ex) {
-			ArrayList<String> catchExceptions = new ArrayList<String>(
-					Arrays.asList(adn.catchExceptions()));
-			ArrayList<String> uncatchExceptions = new ArrayList<String>(
-					Arrays.asList(adn.uncatchExceptions()));
-			if (!catchExceptions.isEmpty() && !uncatchExceptions.isEmpty())
-				throw new BadParametersException(
-						"You should not pass parameters catchExceptions and uncatchExceptions together");
-			else {
-				String exceptionClass = ex.getClass().getSimpleName();
-				if (!catchExceptions.isEmpty() && uncatchExceptions.isEmpty()) {
-					if (catchExceptions.contains(exceptionClass)) {
-						proceedLog(adn, ex);
+		else {
+			try {
+				return proceed(adn);
+			} catch (Exception ex) {
+				ArrayList<String> catchExceptions = new ArrayList<String>(
+						Arrays.asList(adn.catchExceptions()));
+				ArrayList<String> uncatchExceptions = new ArrayList<String>(
+						Arrays.asList(adn.uncatchExceptions()));
+				if (!catchExceptions.isEmpty() && !uncatchExceptions.isEmpty())
+					throw new BadParametersException(
+							"You should not pass parameters catchExceptions and uncatchExceptions together");
+				else {
+					String exceptionClass = ex.getClass().getSimpleName();
+					if (!catchExceptions.isEmpty()
+							&& uncatchExceptions.isEmpty()) {
+						if (catchExceptions.contains(exceptionClass)) {
+							proceedLog(adn, ex);
+						} else {
+							// ignore
+						}
+					} else if (catchExceptions.isEmpty()
+							&& !uncatchExceptions.isEmpty()) {
+						if (uncatchExceptions.contains(exceptionClass)) {
+							// ignore
+						} else {
+							proceedLog(adn, ex);
+						}
 					} else {
-						// ignore
-					}
-				} else if (catchExceptions.isEmpty()
-						&& !uncatchExceptions.isEmpty()) {
-					if (uncatchExceptions.contains(exceptionClass)) {
-						// ignore
-					} else {
 						proceedLog(adn, ex);
 					}
-				} else {
-					proceedLog(adn, ex);
 				}
+				if (errorType == ErrorType.CRITICAL)
+					System.exit(1);
 			}
+			return null;
 		}
-		return null;
 	}
 
 	private void proceedLog(ErrorLogToFile adn, Exception ex) {
@@ -294,37 +311,45 @@ public aspect Handler {
 	}
 
 	Object around(ErrorIgnore adn) throws BadParametersException: ignoreAdn(adn){
-		try {
+		ErrorType errorType = adn.errorType();
+		if (errorType == ErrorType.EASY)
 			return proceed(adn);
-		} catch (Exception ex) {
-			ArrayList<String> catchExceptions = new ArrayList<String>(
-					Arrays.asList(adn.catchExceptions()));
-			ArrayList<String> uncatchExceptions = new ArrayList<String>(
-					Arrays.asList(adn.uncatchExceptions()));
-			if (!catchExceptions.isEmpty() && !uncatchExceptions.isEmpty())
-				throw new BadParametersException(
-						"You should not pass parameters catchExceptions and uncatchExceptions together");
-			else {
-				String exceptionClass = ex.getClass().getSimpleName();
-				if (!catchExceptions.isEmpty() && uncatchExceptions.isEmpty()) {
-					if (catchExceptions.contains(exceptionClass)) {
-						proceedIgnore(adn, ex);
+		else {
+			try {
+				return proceed(adn);
+			} catch (Exception ex) {
+				ArrayList<String> catchExceptions = new ArrayList<String>(
+						Arrays.asList(adn.catchExceptions()));
+				ArrayList<String> uncatchExceptions = new ArrayList<String>(
+						Arrays.asList(adn.uncatchExceptions()));
+				if (!catchExceptions.isEmpty() && !uncatchExceptions.isEmpty())
+					throw new BadParametersException(
+							"You should not pass parameters catchExceptions and uncatchExceptions together");
+				else {
+					String exceptionClass = ex.getClass().getSimpleName();
+					if (!catchExceptions.isEmpty()
+							&& uncatchExceptions.isEmpty()) {
+						if (catchExceptions.contains(exceptionClass)) {
+							proceedIgnore(adn, ex);
+						} else {
+							// ignore
+						}
+					} else if (catchExceptions.isEmpty()
+							&& !uncatchExceptions.isEmpty()) {
+						if (uncatchExceptions.contains(exceptionClass)) {
+							// ignore
+						} else {
+							proceedIgnore(adn, ex);
+						}
 					} else {
-						// ignore
-					}
-				} else if (catchExceptions.isEmpty()
-						&& !uncatchExceptions.isEmpty()) {
-					if (uncatchExceptions.contains(exceptionClass)) {
-						// ignore
-					} else {
 						proceedIgnore(adn, ex);
 					}
-				} else {
-					proceedIgnore(adn, ex);
 				}
+				if (errorType == ErrorType.CRITICAL)
+					System.exit(1);
 			}
+			return null;
 		}
-		return null;
 	}
 
 	private void proceedIgnore(ErrorIgnore adn, Exception ex) {

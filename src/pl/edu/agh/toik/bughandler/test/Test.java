@@ -4,6 +4,7 @@ import pl.edu.agh.toik.bughandler.annotations.ErrorCatch;
 import pl.edu.agh.toik.bughandler.annotations.ErrorIgnore;
 import pl.edu.agh.toik.bughandler.annotations.ErrorLogToFile;
 import pl.edu.agh.toik.bughandler.annotations.ErrorRepeat;
+import pl.edu.agh.toik.bughandler.util.ErrorType;
 
 public class Test {
 
@@ -12,7 +13,7 @@ public class Test {
 		throw new Exception("Fatal error! Turn off your computer");
 	}
 
-	@ErrorCatch(/* catchExceptions = { "Exception" }, */uncatchExceptions = { "ArrayIndexOutOfBoundsException" })
+	@ErrorCatch(errorType=ErrorType.MEDIUM/* catchExceptions = { "Exception" }, *//*uncatchExceptions = { "ArrayIndexOutOfBoundsException" }*/)
 	public static void test2() throws Exception {
 		throw new ArrayIndexOutOfBoundsException(
 				"Fatal error2! Turn off your computer");
@@ -24,7 +25,7 @@ public class Test {
 	}
 
 	public static void test4() throws Exception {
-		throw new ArrayIndexOutOfBoundsException(
+		throw new Exception(
 				"Fatal error4! Turn off your computer");
 	}
 
@@ -37,6 +38,7 @@ public class Test {
 		// test();
 		// test2();
 		// test3();
+		test2();
 		test4();
 		// test5();
 	}

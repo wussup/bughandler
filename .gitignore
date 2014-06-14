@@ -4,7 +4,6 @@
 .mtj.tmp/
 
 # Package Files #
-*.jar
 *.war
 *.ear
 
@@ -22,7 +21,6 @@ target/
 *.class
  
 # Package Files #
-*.jar
 *.war
 *.ear
 *.db
@@ -83,3 +81,4 @@ local.properties
 # PDT-specific
 .buildpath
 /LogFolder
+

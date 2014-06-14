@@ -5,6 +5,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import pl.edu.agh.toik.bughandler.util.ErrorType;
+
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ErrorIgnore {
@@ -13,4 +15,6 @@ public @interface ErrorIgnore {
 	String[] catchExceptions() default {};
 
 	String[] uncatchExceptions() default {};
+
+	ErrorType errorType() default ErrorType.MEDIUM;
 }

@@ -1,5 +1,7 @@
 package pl.edu.agh.toik.bughandler.interfaces;
 
+import pl.edu.agh.toik.bughandler.util.ErrorType;
+
 public interface ITask {
 
 	/**
@@ -9,6 +11,6 @@ public interface ITask {
 	 *            exception object
 	 * @return is onlyHandler
 	 */
-	Boolean proceed(Exception ex);
+	Boolean proceed(Exception ex, ErrorType errorType);
 
 }

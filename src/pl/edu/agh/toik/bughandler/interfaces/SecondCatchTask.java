@@ -2,6 +2,11 @@ package pl.edu.agh.toik.bughandler.interfaces;
 
 import pl.edu.agh.toik.bughandler.util.ErrorType;
 
+/**
+ * @author Taras Melon & Jakub Kolodziej
+ * 
+ *         Second catch task
+ */
 public class SecondCatchTask implements ITask {
 
 	@Override

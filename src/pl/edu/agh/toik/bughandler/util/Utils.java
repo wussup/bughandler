@@ -21,11 +21,25 @@ import pl.edu.agh.toik.bughandler.annotations.ErrorLogToFile;
 import pl.edu.agh.toik.bughandler.annotations.ErrorRepeat;
 import pl.edu.agh.toik.bughandler.interfaces.ITask;
 
+/**
+ * @author Taras Melon & Jakub Kolodziej
+ * 
+ *         Different methods which helps us
+ */
 public class Utils {
 
+	/**
+	 * Invoke catch task for unannotated methods
+	 * 
+	 * @param handlerName
+	 *            name of catch task
+	 * @param ex
+	 *            caught exception
+	 * @return method invocation result
+	 */
 	public static Boolean invokeCatchTask(String handlerName, Exception ex) {
 		List<Class<?>> processorCandidates = ReflectionHelper
-				.findClassesImpmenenting(ITask.class, ITask.class.getPackage());
+				.findClassesImplementing(ITask.class, ITask.class.getPackage());
 		String taskClassName;
 		if (isContainName(processorCandidates, handlerName))
 			taskClassName = handlerName;
@@ -56,9 +70,19 @@ public class Utils {
 		return null;
 	}
 
+	/**
+	 * Invoke catch task for methods with ErrorCatch annotation
+	 * 
+	 * @param adn
+	 *            adnotation object
+	 * @param ex
+	 * @param ex
+	 *            caught exception
+	 * @return method invocation result
+	 */
 	public static Boolean invokeCatchTask(ErrorCatch adn, Exception ex) {
 		List<Class<?>> processorCandidates = ReflectionHelper
-				.findClassesImpmenenting(ITask.class, ITask.class.getPackage());
+				.findClassesImplementing(ITask.class, ITask.class.getPackage());
 		String taskClassName;
 
 		taskClassName = adn.handlerName();
@@ -88,9 +112,19 @@ public class Utils {
 		return null;
 	}
 
+	/**
+	 * Invoke catch task for methods with ErrorRepeat annotation
+	 * 
+	 * @param adn
+	 *            adnotation object
+	 * @param ex
+	 * @param ex
+	 *            caught exception
+	 * @return method invocation result
+	 */
 	public static Boolean invokeRepeatTask(ErrorRepeat adn, Exception ex) {
 		List<Class<?>> processorCandidates = ReflectionHelper
-				.findClassesImpmenenting(ITask.class, ITask.class.getPackage());
+				.findClassesImplementing(ITask.class, ITask.class.getPackage());
 		String taskClassName;
 
 		taskClassName = adn.handlerName();
@@ -120,9 +154,19 @@ public class Utils {
 		return null;
 	}
 
+	/**
+	 * Invoke catch task for methods with ErrorLogToFile annotation
+	 * 
+	 * @param adn
+	 *            adnotation object
+	 * @param ex
+	 * @param ex
+	 *            caught exception
+	 * @return method invocation result
+	 */
 	public static Boolean invokeLogToFileTask(ErrorLogToFile adn, Exception ex) {
 		List<Class<?>> processorCandidates = ReflectionHelper
-				.findClassesImpmenenting(ITask.class, ITask.class.getPackage());
+				.findClassesImplementing(ITask.class, ITask.class.getPackage());
 		String taskClassName;
 
 		taskClassName = adn.handlerName();
@@ -152,9 +196,19 @@ public class Utils {
 		return null;
 	}
 
+	/**
+	 * Invoke catch task for methods with ErrorIgnore annotation
+	 * 
+	 * @param adn
+	 *            adnotation object
+	 * @param ex
+	 * @param ex
+	 *            caught exception
+	 * @return method invocation result
+	 */
 	public static Boolean invokeIgnoreTask(ErrorIgnore adn, Exception ex) {
 		List<Class<?>> processorCandidates = ReflectionHelper
-				.findClassesImpmenenting(ITask.class, ITask.class.getPackage());
+				.findClassesImplementing(ITask.class, ITask.class.getPackage());
 		String taskClassName;
 
 		taskClassName = adn.handlerName();
@@ -184,6 +238,15 @@ public class Utils {
 		return null;
 	}
 
+	/**
+	 * Search class name in list
+	 * 
+	 * @param list
+	 *            list of names of classes
+	 * @param name
+	 *            name of class we looking for
+	 * @return is contain or not
+	 */
 	private static boolean isContainName(List<Class<?>> list, String name) {
 		for (Class<?> c : list) {
 			String[] splittedName = c.getName().split("\\.");
@@ -196,6 +259,12 @@ public class Utils {
 		return false;
 	}
 
+	/**
+	 * Send email message
+	 * 
+	 * @param ex
+	 *            caught exception
+	 */
 	public static void sendEmailMessage(Exception ex) {
 		Properties props = new Properties();
 		props.put("mail.smtp.host", "smtp.gmail.com");
@@ -250,10 +319,24 @@ public class Utils {
 		}
 	}
 
+	/**
+	 * Is empty string
+	 * 
+	 * @param str
+	 *            string
+	 * @return is empty or not
+	 */
 	public static boolean isEmptyString(String str) {
 		return str == null || str.isEmpty();
 	}
 
+	/**
+	 * Generate string from stack trace
+	 * 
+	 * @param ex
+	 *            caught exception
+	 * @return string with stack trace
+	 */
 	private static String stackTraceAsString(Exception ex) {
 		StringWriter sw = new StringWriter();
 		PrintWriter pw = new PrintWriter(sw);
@@ -262,6 +345,9 @@ public class Utils {
 		return stackTrace;
 	}
 
+	/**
+	 * Print system properties
+	 */
 	public static void printSystemProperties() {
 		System.getProperties().list(System.out);
 	}

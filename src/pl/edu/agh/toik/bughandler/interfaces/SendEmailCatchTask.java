@@ -3,6 +3,11 @@ package pl.edu.agh.toik.bughandler.interfaces;
 import pl.edu.agh.toik.bughandler.util.ErrorType;
 import pl.edu.agh.toik.bughandler.util.Utils;
 
+/**
+ * @author Taras Melon & Jakub Kolodziej
+ * 
+ *         Send email catch task
+ */
 public class SendEmailCatchTask implements ITask {
 
 	@Override

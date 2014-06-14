@@ -7,9 +7,23 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
+/**
+ * @author Taras Melon & Jakub Kolodziej
+ * 
+ *         Help to find catch tasks and execute proceed method
+ */
 public class ReflectionHelper {
 
-	public static List<Class<?>> findClassesImpmenenting(
+	/**
+	 * Find classes implementing interface in package
+	 * 
+	 * @param interfaceClass
+	 *            interface
+	 * @param fromPackage
+	 *            package
+	 * @return found classes
+	 */
+	public static List<Class<?>> findClassesImplementing(
 			final Class<?> interfaceClass, final Package fromPackage) {
 
 		if (interfaceClass == null) {
@@ -57,9 +71,12 @@ public class ReflectionHelper {
 	 * Load all classes from a package.
 	 * 
 	 * @param packageName
-	 * @return
+	 *            package name
+	 * @return all classes from a package
 	 * @throws ClassNotFoundException
+	 *             class not found
 	 * @throws IOException
+	 *             io exception
 	 */
 	public static Class<?>[] getAllClassesFromPackage(final String packageName)
 			throws ClassNotFoundException, IOException {
@@ -84,9 +101,12 @@ public class ReflectionHelper {
 	 * Find file in package.
 	 * 
 	 * @param directory
+	 *            directory
 	 * @param packageName
-	 * @return
+	 *            package
+	 * @return classes in package
 	 * @throws ClassNotFoundException
+	 *             class not found
 	 */
 	public static List<Class<?>> findClasses(File directory, String packageName)
 			throws ClassNotFoundException {

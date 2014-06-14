@@ -7,10 +7,21 @@ import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * @author Taras Melon & Jakub Kolodziej
+ * 
+ *         Load settings from settings file
+ */
 public class Settings {
 
+	/**
+	 * Map with settings from settings file
+	 */
 	private Map<String, String> settings = new LinkedHashMap<String, String>();
 
+	/**
+	 * Constructor, do all job
+	 */
 	public Settings() {
 		BufferedReader br;
 		try {
@@ -32,6 +43,11 @@ public class Settings {
 		}
 	}
 
+	/**
+	 * Return map with settings from settings file
+	 * 
+	 * @return map with settings
+	 */
 	public Map<String, String> getSettings() {
 		return settings;
 	}

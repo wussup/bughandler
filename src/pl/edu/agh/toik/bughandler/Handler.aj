@@ -22,15 +22,41 @@ import pl.edu.agh.toik.bughandler.util.ErrorType;
 import pl.edu.agh.toik.bughandler.util.Settings;
 import pl.edu.agh.toik.bughandler.util.Utils;
 
+/**
+ * @author Taras Melon & Jakub Kolodziej
+ * 
+ *         Aspect for handle annotations
+ */
 public aspect Handler {
 
+	/**
+	 * ErrorIgnore annotations should be really ignored or not
+	 */
 	public static boolean shouldIgnore;
+	/**
+	 * ErrorLogToFile annotations should be really logged or not
+	 */
 	public static boolean shouldLog;
+	/**
+	 * Catch task name
+	 */
 	public static String catchTask;
+	/**
+	 * Array of exceptions which should be caught
+	 */
 	public static String[] catchExceptionsArr;
+	/**
+	 * Array of exceptions which should be uncaught
+	 */
 	public static String[] uncatchExceptionsArr;
+	/**
+	 * Exception should be thrown level up for unannotated methods or not
+	 */
 	public static boolean throwLevelUp;
 
+	/**
+	 * Constructor, set fields above with settings from settings file
+	 */
 	public Handler() {
 		Map<String, String> settings = new Settings().getSettings();
 		String ignore = "shouldIgnore";
@@ -52,18 +78,53 @@ public aspect Handler {
 				.get(uncatchExceptionsStr).split(",") : new String[] {};
 	}
 
+	/**
+	 * All exceptions should be SoftException's
+	 */
 	declare soft : Exception : execution(* *.*(..));
 
+	/**
+	 * Pointcut for unannotated methods
+	 */
 	pointcut catched(): execution(* *.*(..)) && if(catchTask != null);
 
+	/**
+	 * Pointcut for ErrorRepeat annotation
+	 * 
+	 * @param adn
+	 *            annotation with parameters
+	 */
 	pointcut repeat(ErrorRepeat adn) : execution(@ErrorRepeat * *.*(..)) && @annotation(adn);
 
+	/**
+	 * Pointcut for ErrorCatch annotation
+	 * 
+	 * @param adn
+	 *            annotation with parameters
+	 */
 	pointcut catchAdn(ErrorCatch adn) : execution(@ErrorCatch * *.*(..)) && @annotation(adn);
 
+	/**
+	 * Pointcut for ErrorLogToFile annotation
+	 * 
+	 * @param adn
+	 *            annotation with parameters
+	 */
 	pointcut logToFileAdn(ErrorLogToFile adn) : execution (@ErrorLogToFile * *.*(..)) && @annotation(adn) && if(shouldLog);
 
+	/**
+	 * Pointcut for ErrorIgnore annotation
+	 * 
+	 * @param adn
+	 *            annotation with parameters
+	 */
 	pointcut ignoreAdn(ErrorIgnore adn) : execution (@ErrorIgnore * *.*(..)) && @annotation(adn) && if(shouldIgnore);
 
+	/**
+	 * Method handle pointcut for unannotated methods
+	 * 
+	 * @return executed method return value
+	 */
 	Object around(): catched()
 	{
 		if (throwLevelUp) {
@@ -100,6 +161,11 @@ public aspect Handler {
 		return null;
 	}
 
+	/**
+	 * Method handle pointcut for methods with ErrorCatch annotation
+	 * 
+	 * @return executed method return value
+	 */
 	Object around(ErrorCatch adn): catchAdn(adn){
 		ErrorType errorType = adn.errorType();
 		if (errorType == ErrorType.EASY)
@@ -166,6 +232,11 @@ public aspect Handler {
 		}
 	}
 
+	/**
+	 * Method handle pointcut for methods with ErrorRepeat annotation
+	 * 
+	 * @return executed method return value
+	 */
 	Object around(ErrorRepeat adn): repeat(adn)
 	{
 		int i = 0;
@@ -243,6 +314,11 @@ public aspect Handler {
 		}
 	}
 
+	/**
+	 * Method handle pointcut for methods with ErrorLogToFile annotation
+	 * 
+	 * @return executed method return value
+	 */
 	Object around(ErrorLogToFile adn) : logToFileAdn(adn){
 		ErrorType errorType = adn.errorType();
 		if (errorType == ErrorType.EASY)
@@ -352,6 +428,11 @@ public aspect Handler {
 		}
 	}
 
+	/**
+	 * Method handle pointcut for methods with ErrorIgnore annotation
+	 * 
+	 * @return executed method return value
+	 */
 	Object around(ErrorIgnore adn): ignoreAdn(adn){
 		ErrorType errorType = adn.errorType();
 		if (errorType == ErrorType.EASY)

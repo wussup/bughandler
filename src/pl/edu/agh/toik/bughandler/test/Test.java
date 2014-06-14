@@ -8,19 +8,12 @@ import pl.edu.agh.toik.bughandler.util.ErrorType;
 
 public class Test {
 
-	@ErrorRepeat(count = 2, time = 2000, handlerName = "DefaultCatchTask", onlyHandler = true)
+	@ErrorRepeat(count = 3, time = 2000, handlerName = "DefaultCatchTask", onlyHandler = true)
 	public static void test() {
 		throw new Exception("Fatal error! Turn off your computer");
 	}
 
-	@ErrorCatch(errorType = ErrorType.MEDIUM/*
-											 * catchExceptions = { "Exception"
-											 * },
-											 *//*
-												 * uncatchExceptions = {
-												 * "ArrayIndexOutOfBoundsException"
-												 * }
-												 */)
+	@ErrorCatch(handlerName = "DefaultCatchTask", onlyHandler = true, uncatchExceptions = { "ArrayIndexOutOfBoundsException" })
 	public static void test2() {
 		throw new ArrayIndexOutOfBoundsException(
 				"Fatal error2! Turn off your computer");
@@ -28,7 +21,8 @@ public class Test {
 
 	@ErrorIgnore()
 	public static void test3() {
-		throw new Exception("Fatal error3! Turn off your computer");
+		test4();
+		//throw new Exception("Fatal error3! Turn off your computer");
 	}
 
 	public static void test4() {
@@ -40,13 +34,17 @@ public class Test {
 		throw new Exception("Fatal error 5! Turn off your computer");
 	}
 
-	public static void main(String[] args) {
-		// test();
-		// test2();
-		// test3();
-		test2();
-		test4();
-		// test5();
+	public static void test6() throws Exception {
+		throw new ArrayIndexOutOfBoundsException(
+				"Fatal error 6! Turn off your computer");
+	}
+public static void main(String[] args) throws Exception {
+//		test();
+//		test2();
+//		test3();
+//		test4();
+		//test6();
+		test3();
 	}
 
 }

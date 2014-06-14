@@ -4,9 +4,6 @@ import org.aspectj.lang.SoftException;
 
 public class BadParametersException extends SoftException {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	public BadParametersException(Throwable arg0) {

@@ -1,7 +1,7 @@
 shouldIgnore=true
 shouldLog=true
 catchTask=DefaultCatchTask
-catchExceptions=ArrayIndexOutOfBoundsException
+catchExceptions=SoftException,Exception
 #if we define catchExceptions and uncatchExceptions together, then program behaves as catchExceptions defined only
 #uncatchExceptions=ArrayIndexOutOfBoundsException
-throwLevelUp=true
+throwLevelUp=false

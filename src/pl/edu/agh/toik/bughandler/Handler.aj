@@ -18,6 +18,7 @@ import pl.edu.agh.toik.bughandler.annotations.ErrorIgnore;
 import pl.edu.agh.toik.bughandler.annotations.ErrorLogToFile;
 import pl.edu.agh.toik.bughandler.annotations.ErrorRepeat;
 import pl.edu.agh.toik.bughandler.util.BadParametersException;
+import pl.edu.agh.toik.bughandler.util.ErrorType;
 import pl.edu.agh.toik.bughandler.util.Settings;
 import pl.edu.agh.toik.bughandler.util.Utils;
 
@@ -90,38 +91,45 @@ public aspect Handler {
 	}
 
 	Object around(ErrorCatch adn) throws BadParametersException: catchAdn(adn){
-		try {
+		ErrorType errorType = adn.errorType();
+		if (errorType == ErrorType.EASY)
 			return proceed(adn);
-		} catch (Exception ex) {
-			ArrayList<String> catchExceptions = new ArrayList<String>(
-					Arrays.asList(adn.catchExceptions()));
-			ArrayList<String> uncatchExceptions = new ArrayList<String>(
-					Arrays.asList(adn.uncatchExceptions()));
-			if (!catchExceptions.isEmpty() && !uncatchExceptions.isEmpty())
-				throw new BadParametersException(
-						"You should not pass parameters catchExceptions and uncatchExceptions together");
-			else {
-				String exceptionClass = ex.getClass().getSimpleName();
-				if (!catchExceptions.isEmpty() && uncatchExceptions.isEmpty()) {
-					if (catchExceptions.contains(exceptionClass)) {
-						proceedCatch(adn, ex);
+		else {
+			try {
+				return proceed(adn);
+			} catch (Exception ex) {
+				ArrayList<String> catchExceptions = new ArrayList<String>(
+						Arrays.asList(adn.catchExceptions()));
+				ArrayList<String> uncatchExceptions = new ArrayList<String>(
+						Arrays.asList(adn.uncatchExceptions()));
+				if (!catchExceptions.isEmpty() && !uncatchExceptions.isEmpty())
+					throw new BadParametersException(
+							"You should not pass parameters catchExceptions and uncatchExceptions together");
+				else {
+					String exceptionClass = ex.getClass().getSimpleName();
+					if (!catchExceptions.isEmpty()
+							&& uncatchExceptions.isEmpty()) {
+						if (catchExceptions.contains(exceptionClass)) {
+							proceedCatch(adn, ex);
+						} else {
+							// ignore
+						}
+					} else if (catchExceptions.isEmpty()
+							&& !uncatchExceptions.isEmpty()) {
+						if (uncatchExceptions.contains(exceptionClass)) {
+							// ignore
+						} else {
+							proceedCatch(adn, ex);
+						}
 					} else {
-						// ignore
-					}
-				} else if (catchExceptions.isEmpty()
-						&& !uncatchExceptions.isEmpty()) {
-					if (uncatchExceptions.contains(exceptionClass)) {
-						// ignore
-					} else {
 						proceedCatch(adn, ex);
 					}
-				} else {
-					proceedCatch(adn, ex);
 				}
+				if (errorType == ErrorType.CRITICAL)
+					System.exit(1);
 			}
+			return null;
 		}
-
-		return null;
 	}
 
 	private void proceedCatch(ErrorCatch adn, Exception ex) {

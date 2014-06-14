@@ -1,4 +1,4 @@
 BugHandler
 ==========
 
-Aspect handles exceptions and then sends mails with stack trace and other information.
+Handle exceptions with AspectJ and execute different tasks for each one or for group of exceptions.

@@ -48,6 +48,8 @@ public aspect Handler {
 				.get(uncatchExceptionsStr).split(",") : new String[] {};
 	}
 
+	declare soft : Exception : execution(* *.*(..));
+
 	pointcut catched(): execution(* *.*(..)) && if(catchTask != null);
 
 	pointcut repeat(ErrorRepeat adn) : execution(@ErrorRepeat * *.*(..)) && @annotation(adn);
@@ -104,7 +106,8 @@ public aspect Handler {
 						Arrays.asList(adn.uncatchExceptions()));
 				if (!catchExceptions.isEmpty() && !uncatchExceptions.isEmpty())
 					throw new BadParametersException(
-							"You should not pass parameters catchExceptions and uncatchExceptions together");
+							new Exception(
+									"You should not pass parameters catchExceptions and uncatchExceptions together"));
 				else {
 					String exceptionClass = ex.getClass().getSimpleName();
 					if (!catchExceptions.isEmpty()
@@ -164,7 +167,8 @@ public aspect Handler {
 					if (!catchExceptions.isEmpty()
 							&& !uncatchExceptions.isEmpty())
 						throw new BadParametersException(
-								"You should not pass parameters catchExceptions and uncatchExceptions together");
+								new Exception(
+										"You should not pass parameters catchExceptions and uncatchExceptions together"));
 					else {
 						String exceptionClass = ex.getClass().getSimpleName();
 						if (!catchExceptions.isEmpty()
@@ -226,7 +230,8 @@ public aspect Handler {
 						Arrays.asList(adn.uncatchExceptions()));
 				if (!catchExceptions.isEmpty() && !uncatchExceptions.isEmpty())
 					throw new BadParametersException(
-							"You should not pass parameters catchExceptions and uncatchExceptions together");
+							new Exception(
+									"You should not pass parameters catchExceptions and uncatchExceptions together"));
 				else {
 					String exceptionClass = ex.getClass().getSimpleName();
 					if (!catchExceptions.isEmpty()
@@ -324,7 +329,8 @@ public aspect Handler {
 						Arrays.asList(adn.uncatchExceptions()));
 				if (!catchExceptions.isEmpty() && !uncatchExceptions.isEmpty())
 					throw new BadParametersException(
-							"You should not pass parameters catchExceptions and uncatchExceptions together");
+							new Exception(
+									"You should not pass parameters catchExceptions and uncatchExceptions together"));
 				else {
 					String exceptionClass = ex.getClass().getSimpleName();
 					if (!catchExceptions.isEmpty()

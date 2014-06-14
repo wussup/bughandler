@@ -17,6 +17,6 @@ public @interface ErrorCatch {
 	String[] catchExceptions() default {};
 
 	String[] uncatchExceptions() default {};
-	
+
 	ErrorType errorType() default ErrorType.MEDIUM;
 }

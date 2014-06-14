@@ -28,6 +28,7 @@ public aspect Handler {
 	public static String catchTask;
 	public static String[] catchExceptionsArr;
 	public static String[] uncatchExceptionsArr;
+	public static boolean throwLevelUp;
 
 	public Handler() {
 		Map<String, String> settings = new Settings().getSettings();
@@ -36,6 +37,9 @@ public aspect Handler {
 		String task = "catchTask";
 		String catchExceptionsStr = "catchExceptions";
 		String uncatchExceptionsStr = "uncatchExceptions";
+		String throwUp = "throwLevelUp";
+		throwLevelUp = settings.containsKey(throwUp) ? Boolean.valueOf(settings
+				.get(throwUp)) : true;
 		shouldIgnore = settings.containsKey(ignore) ? Boolean.valueOf(settings
 				.get(ignore)) : true;
 		shouldLog = settings.containsKey(log) ? Boolean.valueOf(settings
@@ -59,31 +63,38 @@ public aspect Handler {
 
 	Object around(): catched()
 	{
-		try {
+		if (throwLevelUp)
+		{
 			return proceed();
-		} catch (Exception ex) {
-			ArrayList<String> catchExceptions = new ArrayList<String>(
-					Arrays.asList(catchExceptionsArr));
-			ArrayList<String> uncatchExceptions = new ArrayList<String>(
-					Arrays.asList(uncatchExceptionsArr));
-			String exceptionClass = ex.getClass().getSimpleName();
-			if ((!catchExceptions.isEmpty() && uncatchExceptions.isEmpty())
-					|| (!catchExceptions.isEmpty() && !uncatchExceptions
-							.isEmpty())) {
-				if (catchExceptions.contains(exceptionClass)) {
-					Utils.invokeCatchTask(catchTask, ex);
+		}
+		else
+		{
+			try {
+				return proceed();
+			} catch (Exception ex) {
+				ArrayList<String> catchExceptions = new ArrayList<String>(
+						Arrays.asList(catchExceptionsArr));
+				ArrayList<String> uncatchExceptions = new ArrayList<String>(
+						Arrays.asList(uncatchExceptionsArr));
+				String exceptionClass = ex.getClass().getSimpleName();
+				if ((!catchExceptions.isEmpty() && uncatchExceptions.isEmpty())
+						|| (!catchExceptions.isEmpty() && !uncatchExceptions
+								.isEmpty())) {
+					if (catchExceptions.contains(exceptionClass)) {
+						Utils.invokeCatchTask(catchTask, ex);
+					} else {
+						// ignore
+					}
+				} else if (catchExceptions.isEmpty()
+						&& !uncatchExceptions.isEmpty()) {
+					if (uncatchExceptions.contains(exceptionClass)) {
+						// ignore
+					} else {
+						Utils.invokeCatchTask(catchTask, ex);
+					}
 				} else {
-					// ignore
-				}
-			} else if (catchExceptions.isEmpty()
-					&& !uncatchExceptions.isEmpty()) {
-				if (uncatchExceptions.contains(exceptionClass)) {
-					// ignore
-				} else {
 					Utils.invokeCatchTask(catchTask, ex);
 				}
-			} else {
-				Utils.invokeCatchTask(catchTask, ex);
 			}
 		}
 		return null;
@@ -97,20 +108,28 @@ public aspect Handler {
 					Arrays.asList(adn.catchExceptions()));
 			ArrayList<String> uncatchExceptions = new ArrayList<String>(
 					Arrays.asList(adn.uncatchExceptions()));
+			ArrayList<String> catchExceptionsFromConfig = new ArrayList<String>(
+					Arrays.asList(catchExceptionsArr));
+			ArrayList<String> uncatchExceptionsFromConfig = new ArrayList<String>(
+					Arrays.asList(uncatchExceptionsArr));
 			if (!catchExceptions.isEmpty() && !uncatchExceptions.isEmpty())
 				throw new BadParametersException(
 						"You should not pass parameters catchExceptions and uncatchExceptions together");
 			else {
 				String exceptionClass = ex.getClass().getSimpleName();
 				if (!catchExceptions.isEmpty() && uncatchExceptions.isEmpty()) {
-					if (catchExceptions.contains(exceptionClass)) {
+					if (catchExceptions.contains(exceptionClass)
+							|| catchExceptionsFromConfig
+									.contains(exceptionClass)) {
 						proceedCatch(adn, ex);
 					} else {
 						// ignore
 					}
 				} else if (catchExceptions.isEmpty()
 						&& !uncatchExceptions.isEmpty()) {
-					if (uncatchExceptions.contains(exceptionClass)) {
+					if (uncatchExceptions.contains(exceptionClass)
+							|| uncatchExceptionsFromConfig
+									.contains(exceptionClass)) {
 						// ignore
 					} else {
 						proceedCatch(adn, ex);
@@ -148,6 +167,10 @@ public aspect Handler {
 						Arrays.asList(adn.catchExceptions()));
 				ArrayList<String> uncatchExceptions = new ArrayList<String>(
 						Arrays.asList(adn.uncatchExceptions()));
+				ArrayList<String> catchExceptionsFromConfig = new ArrayList<String>(
+						Arrays.asList(catchExceptionsArr));
+				ArrayList<String> uncatchExceptionsFromConfig = new ArrayList<String>(
+						Arrays.asList(uncatchExceptionsArr));
 				if (!catchExceptions.isEmpty() && !uncatchExceptions.isEmpty())
 					throw new BadParametersException(
 							"You should not pass parameters catchExceptions and uncatchExceptions together");
@@ -155,14 +178,18 @@ public aspect Handler {
 					String exceptionClass = ex.getClass().getSimpleName();
 					if (!catchExceptions.isEmpty()
 							&& uncatchExceptions.isEmpty()) {
-						if (catchExceptions.contains(exceptionClass)) {
+						if (catchExceptions.contains(exceptionClass)
+								|| catchExceptionsFromConfig
+										.contains(exceptionClass)) {
 							proceedRepeat(adn, ex);
 						} else {
 							// ignore
 						}
 					} else if (catchExceptions.isEmpty()
 							&& !uncatchExceptions.isEmpty()) {
-						if (uncatchExceptions.contains(exceptionClass)) {
+						if (uncatchExceptions.contains(exceptionClass)
+								|| uncatchExceptionsFromConfig
+										.contains(exceptionClass)) {
 							// ignore
 						} else {
 							proceedRepeat(adn, ex);
@@ -203,20 +230,28 @@ public aspect Handler {
 					Arrays.asList(adn.catchExceptions()));
 			ArrayList<String> uncatchExceptions = new ArrayList<String>(
 					Arrays.asList(adn.uncatchExceptions()));
+			ArrayList<String> catchExceptionsFromConfig = new ArrayList<String>(
+					Arrays.asList(catchExceptionsArr));
+			ArrayList<String> uncatchExceptionsFromConfig = new ArrayList<String>(
+					Arrays.asList(uncatchExceptionsArr));
 			if (!catchExceptions.isEmpty() && !uncatchExceptions.isEmpty())
 				throw new BadParametersException(
 						"You should not pass parameters catchExceptions and uncatchExceptions together");
 			else {
 				String exceptionClass = ex.getClass().getSimpleName();
 				if (!catchExceptions.isEmpty() && uncatchExceptions.isEmpty()) {
-					if (catchExceptions.contains(exceptionClass)) {
+					if (catchExceptions.contains(exceptionClass)
+							|| catchExceptionsFromConfig
+									.contains(exceptionClass)) {
 						proceedLog(adn, ex);
 					} else {
 						// ignore
 					}
 				} else if (catchExceptions.isEmpty()
 						&& !uncatchExceptions.isEmpty()) {
-					if (uncatchExceptions.contains(exceptionClass)) {
+					if (uncatchExceptions.contains(exceptionClass)
+							|| uncatchExceptionsFromConfig
+									.contains(exceptionClass)) {
 						// ignore
 					} else {
 						proceedLog(adn, ex);
@@ -293,20 +328,28 @@ public aspect Handler {
 					Arrays.asList(adn.catchExceptions()));
 			ArrayList<String> uncatchExceptions = new ArrayList<String>(
 					Arrays.asList(adn.uncatchExceptions()));
+			ArrayList<String> catchExceptionsFromConfig = new ArrayList<String>(
+					Arrays.asList(catchExceptionsArr));
+			ArrayList<String> uncatchExceptionsFromConfig = new ArrayList<String>(
+					Arrays.asList(uncatchExceptionsArr));
 			if (!catchExceptions.isEmpty() && !uncatchExceptions.isEmpty())
 				throw new BadParametersException(
 						"You should not pass parameters catchExceptions and uncatchExceptions together");
 			else {
 				String exceptionClass = ex.getClass().getSimpleName();
 				if (!catchExceptions.isEmpty() && uncatchExceptions.isEmpty()) {
-					if (catchExceptions.contains(exceptionClass)) {
+					if (catchExceptions.contains(exceptionClass)
+							|| catchExceptionsFromConfig
+									.contains(exceptionClass)) {
 						proceedIgnore(adn, ex);
 					} else {
 						// ignore
 					}
 				} else if (catchExceptions.isEmpty()
 						&& !uncatchExceptions.isEmpty()) {
-					if (uncatchExceptions.contains(exceptionClass)) {
+					if (uncatchExceptions.contains(exceptionClass)
+							|| uncatchExceptionsFromConfig
+									.contains(exceptionClass)) {
 						// ignore
 					} else {
 						proceedIgnore(adn, ex);
